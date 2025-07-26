@@ -1,0 +1,126 @@
+import React, { useState } from "react";
+import { FcGoogle } from "react-icons/fc";
+import axios from "axios";
+
+const Register = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [hostel, setHostel] = useState("");
+  const [email, setEmail] = useState("");
+  const [rollNumber, setRollNumber] = useState(""); // New state
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const name = `${firstName} ${lastName}`;
+
+    try {
+      const res = await axios.post('/api/auth/register', {
+        name,
+        email,
+        password,
+        hostel,
+        rollNumber, // Include roll number
+      });
+
+      alert("Registration successful!");
+    } catch (err) {
+      alert(err.response?.data?.msg || "Registration failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#151544] flex items-center justify-center px-4">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <h2 className="text-3xl font-semibold text-center text-gray-900">Sign up</h2>
+        <br />
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex gap-4">
+            <input
+              type="text"
+              placeholder="First Name*"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="w-1/2 px-4 py-2 border-b-2 focus:outline-none focus:border-blue-500 placeholder:text-sm"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Last Name*"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="w-1/2 px-4 py-2 border-b-2 focus:outline-none focus:border-blue-500 placeholder:text-sm"
+              required
+            />
+          </div>
+
+          <input
+            type="text"
+            placeholder="Roll Number*"
+            value={rollNumber}
+            onChange={(e) => setRollNumber(e.target.value)}
+            className="w-full px-4 py-2 border-b-2 focus:outline-none focus:border-blue-500 placeholder:text-sm"
+            required
+          />
+
+          <input
+            type="text"
+            placeholder="Hostel / Block*"
+            value={hostel}
+            onChange={(e) => setHostel(e.target.value)}
+            className="w-full px-4 py-2 border-b-2 focus:outline-none focus:border-blue-500 placeholder:text-sm"
+            required
+          />
+
+          <input
+            type="email"
+            placeholder="Email*"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2 border-b-2 focus:outline-none focus:border-blue-500 placeholder:text-sm"
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Password*"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-2 border-b-2 focus:outline-none focus:border-blue-500 placeholder:text-sm"
+            required
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-black py-2 rounded-md transition duration-300"
+          >
+            {loading ? "Signing up..." : "Create Account"}
+          </button>
+
+          <button
+            type="button"
+            className="flex items-center justify-center w-full border border-gray-300 rounded-md py-2 text-sm font-medium gap-2 hover:bg-gray-50 mb-6"
+          >
+            <FcGoogle className="text-xl" />
+            Sign up with Google
+          </button>
+
+          <div className="text-center mt-2 text-sm">
+            <a href="/login" className="text-blue-600 hover:underline">
+              Already have an account?
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Register;
