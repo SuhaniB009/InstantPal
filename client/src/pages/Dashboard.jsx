@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import AvailableOrders from '../components/AvailableOrders';
 import MyOrders from '../components/MyOrders';
-import api from '../utils/api';
+import {api} from '../utils/api';
 
 // --- MODAL COMPONENT ---
 const JoinOrderModal = ({ order, isOpen, onClose, onSubmit }) => {

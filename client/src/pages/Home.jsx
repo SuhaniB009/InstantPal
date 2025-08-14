@@ -4,6 +4,7 @@ import WhyInstapal from '../components/WhyInstapal.jsx'
 import HowInstapalWorks from '../components/HowInstapalWorks'
 import Navbar from '../components/Navbar';
 
+
 export default function Home() {
   return (
     <div className=" min-h-screen flex flex-col">

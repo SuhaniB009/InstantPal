@@ -1,8 +1,10 @@
 // client/src/utils/api.js
 import axios from 'axios';
+import { BACKEND_URL } from './config';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL, // must be set in client/.env
+export const api = axios.create({
+  baseURL: BACKEND_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
-
-export default api;

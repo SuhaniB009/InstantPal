@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FcGoogle } from 'react-icons/fc'
 import { FaSpinner } from 'react-icons/fa'
 import axios from 'axios'
+import {api} from '../utils/api';
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -17,7 +18,7 @@ export default function Login() {
     setError('')
 
     try {
-      const res = await axios.post('/api/auth/login', {
+      const res = await api.post('/api/auth/login', {
         email,
         password,
       })
