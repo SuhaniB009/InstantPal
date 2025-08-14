@@ -19,7 +19,7 @@ const server = http.createServer(app);
 // ✅ Only your deployed client is allowed (remove localhost to avoid confusion)
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://instantpal-server.onrender.com'
+  'https://instantpal-client.onrender.com'
 ].filter(Boolean);
 
 // ✅ CORS options shared by Express & Socket.IO
