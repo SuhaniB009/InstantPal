@@ -1,7 +1,8 @@
-import axios from 'axios'
+// client/src/utils/api.js
+import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // backend runs on 5000
-})
+  baseURL: import.meta.env.VITE_BACKEND_URL, // must be set in client/.env
+});
 
-export default api
+export default api;

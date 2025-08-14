@@ -37,7 +37,7 @@ const JoinOrderModal = ({ order, isOpen, onClose, onSubmit }) => {
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
         <h2 className="text-2xl font-bold mb-2">Join Order</h2>
         <p className="mb-4">
-          Add your item to the <span className="font-semibold">{order.platform}</span> order.
+          Add your item to the <span className="font-semibold">{order?.platform}</span> order.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -107,18 +107,26 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
-  const config = useMemo(() => ({
-    headers: { Authorization: `Bearer ${token}` },
-  }), [token]);
+  const config = useMemo(
+    () => ({ headers: { Authorization: `Bearer ${token}` } }),
+    [token]
+  );
 
   const fetchData = async () => {
     try {
-      const res = await api.get('/auth/profile', config);
+      // ✅ FIX: add /api prefix
+      const res = await api.get('/api/auth/profile', config);
       setUser(res.data);
-      const orderRes = await api.get('/orders/hostel', config);
-      setAllOrders(orderRes.data);
+
+      const orderRes = await api.get('/api/orders/hostel', config);
+      const ordersArr = Array.isArray(orderRes.data)
+        ? orderRes.data
+        : Array.isArray(orderRes.data?.orders)
+        ? orderRes.data.orders
+        : [];
+      setAllOrders(ordersArr);
     } catch (err) {
-      console.error(err);
+      console.error('Dashboard fetch error:', err?.response?.data || err.message);
       navigate('/login');
     }
   };
@@ -126,30 +134,28 @@ const Dashboard = () => {
   useEffect(() => {
     if (token) fetchData();
     else navigate('/login');
-  }, [navigate, token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   const myOrders = useMemo(() => {
-    if (!user || !allOrders.length) return [];
-    return allOrders.filter(order =>
-      order.initiatedBy?.email === user.email
-    );
+    if (!user || !Array.isArray(allOrders)) return [];
+    return allOrders.filter((order) => order?.initiatedBy?.email === user.email);
   }, [user, allOrders]);
 
   const availableOrders = useMemo(() => {
-    if (!user || !allOrders.length) return [];
-    return allOrders.filter(order =>
-      order.initiatedBy?.email !== user.email
-    );
+    if (!user || !Array.isArray(allOrders)) return [];
+    return allOrders.filter((order) => order?.initiatedBy?.email !== user.email);
   }, [user, allOrders]);
 
   const handleStartOrder = async () => {
     try {
-      await api.post('/orders/create', { platform, items, upi }, config);
-      fetchData();
+      // ✅ FIX: add /api prefix
+      await api.post('/api/orders/create', { platform, items, upi }, config);
+      await fetchData();
       setItems('');
       setUpi('');
     } catch (err) {
-      alert('Error creating order');
+      alert(err?.response?.data?.message || 'Error creating order');
     }
   };
 
@@ -164,22 +170,28 @@ const Dashboard = () => {
   };
 
   const handleJoinSubmit = async (formData) => {
-    if (!selectedOrder) return;
+    if (!selectedOrder?._id) return;
     try {
-      await api.post(`/orders/join/${selectedOrder._id}`, formData, config);
-      fetchData();
+      // ✅ FIX: add /api prefix
+      await api.post(`/api/orders/join/${selectedOrder._id}`, formData, config);
+      await fetchData();
       handleCloseJoinModal();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to join order.');
+      alert(err?.response?.data?.message || 'Failed to join order.');
     }
   };
 
   const handleLock = async (orderId) => {
-    // ... (Your existing lock logic)
+    try {
+      await api.post(`/api/orders/lock/${orderId}`, {}, config);
+      await fetchData();
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Failed to lock order.');
+    }
   };
 
   const handleDelete = async (orderId) => {
-    // ... (Your existing delete logic)
+    // If you have a delete endpoint, wire it here similarly
   };
 
   if (!user) {
@@ -193,14 +205,9 @@ const Dashboard = () => {
   return (
     <div className="p-6 space-y-8">
       <Header user={user} />
-      
-      {/* The Available Orders section */}
-      <AvailableOrders
-        orders={availableOrders}
-        onJoinClick={handleOpenJoinModal}
-      />
 
-      {/* The "Start New Order" form is now here */}
+      <AvailableOrders orders={availableOrders} onJoinClick={handleOpenJoinModal} />
+
       <div className="bg-gray-100 p-6 rounded-xl shadow">
         <h2 className="text-xl font-semibold mb-4">➕ Start a New Group Order</h2>
         <div className="grid gap-4">
@@ -236,8 +243,7 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
-      
-      {/* The "My Orders" section has been moved here */}
+
       <MyOrders
         orders={myOrders}
         handleLock={handleLock}
@@ -245,7 +251,6 @@ const Dashboard = () => {
         currentUser={user}
       />
 
-      {/* The modal's position in the JSX does not affect its appearance */}
       <JoinOrderModal
         isOpen={isJoinModalOpen}
         onClose={handleCloseJoinModal}

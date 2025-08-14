@@ -8,7 +8,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       // Forward any request starting with /api to your backend on port 5000
-      '/api': 'http://localhost:5000'
+      '/api': 'https://instantpal-server.onrender.com'
     }
   }
 })
