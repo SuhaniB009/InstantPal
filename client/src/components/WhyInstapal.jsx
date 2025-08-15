@@ -1,4 +1,3 @@
-//components/WhyInstapal.jsx
 import { ShieldCheck, ShoppingCart, Bell } from 'lucide-react'
 
 export default function WhyInstapal() {

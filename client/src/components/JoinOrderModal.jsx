@@ -1,5 +1,3 @@
-// src/components/JoinOrderModal.jsx
-
 import React, { useState } from 'react';
 
 const JoinOrderModal = ({ order, isOpen, onClose, onSubmit }) => {
@@ -17,13 +15,11 @@ const JoinOrderModal = ({ order, isOpen, onClose, onSubmit }) => {
       return;
     }
     setError('');
-    // Pass the form data to the parent component's submit handler
     onSubmit({ name, quantity, link });
   };
 
   return (
-    // Backdrop
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-yellow-50 bg-opacity-50 flex justify-center items-center z-50">
       {/* Modal Content */}
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
         <h2 className="text-2xl font-bold mb-2">Join Order</h2>

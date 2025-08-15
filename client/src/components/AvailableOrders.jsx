@@ -1,7 +1,6 @@
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 
-// Note the prop name change from handleJoin to onJoinClick
 const AvailableOrders = ({ orders, onJoinClick }) => {
   return (
     <div className="p-4">

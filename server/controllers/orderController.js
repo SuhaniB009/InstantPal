@@ -1,4 +1,3 @@
-//controllers/orderController.js
 
 import Order from '../models/Order.js';
 
@@ -171,7 +170,7 @@ return res.status(403).json({ msg: 'Only the initiator can lock the order' });
 
 
 order.status = 'Locked';
-
+order.lockedAt = new Date();//Add this line to set the timestamp
 await order.save();
 
 res.json(order);
@@ -224,4 +223,52 @@ res.status(500).json({ msg: 'Server error' });
 
 }
 
+};
+// ✅ GET single order by ID
+export const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate('initiatedBy', 'name email')
+      .populate('items.user', 'name email');
+
+    if (!order) return res.status(404).json({ msg: 'Order not found' });
+    res.json(order);
+  } catch (err) {
+    console.error('Get Order By ID Error:', err);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+// ✅ NEW: Delete Order Logic
+export const deleteOrder = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const userId = req.user.id;
+
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ msg: 'Order not found' });
+
+    const isInitiator = order.initiatedBy.toString() === userId.toString();
+    const isParticipant = order.items.some(item => item.user.toString() === userId.toString());
+
+    if (!isInitiator && !isParticipant) {
+      return res.status(403).json({ msg: 'Not authorized to delete this order' });
+    }
+
+    // If initiator → delete completely for all hostel users
+    if (isInitiator) {
+      await Order.findByIdAndDelete(orderId);
+      return res.status(200).json({ msg: 'Order deleted for all users in same hostel' });
+    }
+
+    // If participant → remove only their items from order
+    if (isParticipant) {
+      order.items = order.items.filter(item => item.user.toString() !== userId.toString());
+      await order.save();
+      return res.status(200).json({ msg: 'You have left the order' });
+    }
+
+  } catch (error) {
+    console.error('Delete Order Error:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
 };

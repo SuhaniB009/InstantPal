@@ -10,7 +10,9 @@ name: { type: String, required: true },
 
 quantity: { type: Number, required: true },
 
-link: { type: String } // optional: product link
+link: { type: String }, // optional: product link
+
+
 
 });
 
@@ -76,6 +78,7 @@ enum: ['Open', 'Locked'],
 default: 'Open'
 
 },
+lockedAt: { type: Date },
 
 joinedUsers: [
 

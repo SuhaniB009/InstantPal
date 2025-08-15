@@ -1,4 +1,3 @@
-// client/src/utils/api.js
 import axios from 'axios';
 import { BACKEND_URL } from './config';
 

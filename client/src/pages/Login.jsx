@@ -24,11 +24,9 @@ export default function Login() {
       })
 
       localStorage.setItem('token', res.data.token)
-      // Optionally store user details too
-      // localStorage.setItem('user', JSON.stringify(res.data.user))
 
       setIsLoading(false)
-      navigate('/dashboard') // or dashboard
+      navigate('/dashboard') 
     } catch (err) {
       console.error(err)
       setError(err.response?.data?.message || 'Login failed')
@@ -38,7 +36,7 @@ export default function Login() {
 
   const handleGoogleLogin = () => {
     console.log('Google login clicked')
-    // Add Google OAuth logic here
+    
   }
 
   return (

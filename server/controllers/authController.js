@@ -2,8 +2,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-// REGISTER
-// controllers/authController.js
 
 
 
@@ -13,18 +11,15 @@ export const registerUser = async (req, res) => {
     if (!/^[0-9]{4}[a-z]{4}[0-9]{3}@nitjsr\.ac\.in$/.test(email)) {
     return res.status(400).json({ error: 'Invalid college email format.' });
   }
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ msg: 'User already exists' });
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
     const newUser = new User({
       name,
-      rollNumber, // ✅ make sure this is passed
+      rollNumber, 
       email,
       password: hashedPassword,
       hostel
@@ -32,7 +27,6 @@ export const registerUser = async (req, res) => {
 
     await newUser.save();
 
-    // Create token
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: '1h',
     });
@@ -44,7 +38,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// LOGIN
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -70,10 +63,8 @@ export const loginUser = async (req, res) => {
   }
 };
 
-//GETPROFILE
 export const getProfile = async (req, res) => {
-  const user = req.user // Already set by the protect middleware
-
+  const user = req.user 
   if (user) {
     res.json({
       name: user.name,

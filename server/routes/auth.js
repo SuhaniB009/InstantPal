@@ -1,4 +1,3 @@
-// server/routes/auth.js
 import express from 'express';
 import { registerUser, loginUser, getProfile } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';

@@ -1,4 +1,3 @@
-//components/HowInstapalWorks.jsx
 import { CheckCircle } from 'lucide-react'
 
 export default function HowInstapalWorks() {

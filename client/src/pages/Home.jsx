@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import { Link } from 'react-router-dom'
 import WhyInstapal from '../components/WhyInstapal.jsx'
 import HowInstapalWorks from '../components/HowInstapalWorks'
@@ -9,11 +8,8 @@ export default function Home() {
   return (
     <div className=" min-h-screen flex flex-col">
 
-      {/* Navbar */}
       <Navbar/>
-      {/* Hero Section */}
       <div className="flex-1 flex flex-col lg:flex-row bg-white shadow-yellow">
-        {/* Left Text Section */}
         <div className="flex-1 flex items-center justify-center p-8 bg-white">
           <div className="max-w-md text-center lg:text-left">
             <div className="text-left mb-6 relative">
@@ -59,7 +55,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Right Illustration/Image Section */}
         <div className="flex-1 hidden lg:flex items-center justify-center">
           <img
             src="/instapal_home_image copy.png"
@@ -71,7 +66,6 @@ export default function Home() {
       
       <WhyInstapal />
 
-      {/* Supported Platforms Section */}
       <section className="bg-white py-12 px-4 text-center">
         <h2 className="text-3xl font-semibold text-blue-800">Order From Your Favorite Platforms</h2>
         <br></br>
@@ -104,12 +98,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How it Works Section */}
       <HowInstapalWorks />
 
 
-
-      {/* Footer */}
       <footer className="bg-gray-100 text-center py-6 text-sm text-gray-500">
         Built with ❤️ by NITJSR students | Instapal 2025
       </footer>
