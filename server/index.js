@@ -1,8 +1,12 @@
+//server/index.js...
 import express from 'express';
+
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
 import { Server } from 'socket.io';
+
 import http from 'http';
 import path from 'path';
 
@@ -13,6 +17,7 @@ const __dirname = path.resolve();
 dotenv.config();
 
 const app = express();
+
 const server = http.createServer(app);
 
 const allowedOrigins = [
