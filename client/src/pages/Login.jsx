@@ -40,20 +40,13 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-50 via-white to-blue-100 px-4 py-12">
-      <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-8">
-        <h2 className="text-3xl font-bold text-center text-blue-800 mb-6">Welcome Back 👋</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-50 via-white to-blue-10 px-4 py-12">
+      <div className="w-full max-w-md bg-yellow-50 shadow-xl rounded-xl p-8">
+        <h2 className="text-3xl font-bold text-center  text-blue-800 pt-3 mb-3">Welcome Back </h2>
         <p className="text-center text-gray-600 mb-8 text-sm">
           Login to your Instapal account using your NITJSR email.
         </p>
-
-        <button
-          onClick={handleGoogleLogin}
-          className="flex items-center justify-center w-full border border-gray-300 rounded-md py-2 text-gray-700 hover:bg-gray-100 transition mb-6"
-        >
-          <FcGoogle className="text-xl mr-2" />
-          Continue with Google
-        </button>
+       
 
         <div className="flex items-center justify-center mb-4">
           <hr className="flex-grow border-gray-300" />
@@ -106,7 +99,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full flex items-center justify-center gap-2 bg-yellow-400 text-black font-semibold py-2 rounded-md hover:bg-yellow-500 transition ${
+            className={`w-full flex items-center justify-center gap-2 bg-yellow-400 text-black font-semibold py-2 rounded-md hover:bg-yellow-700 transition ${
               isLoading ? 'opacity-70 cursor-not-allowed' : ''
             }`}
           >

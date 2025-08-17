@@ -7,36 +7,30 @@ import User from '../models/User.js';
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, rollNumber, email, password, hostel } = req.body;
+    const { name, rollNumber, email, password, hostel, roomNumber } = req.body;
     if (!/^[0-9]{4}[a-z]{4}[0-9]{3}@nitjsr\.ac\.in$/.test(email)) {
-    return res.status(400).json({ error: 'Invalid college email format.' });
-  }
+      return res.status(400).json({ error: 'Invalid college email format.' });
+    }
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ msg: 'User already exists' });
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = new User({
-      name,
-      rollNumber, 
-      email,
-      password: hashedPassword,
-      hostel
-    });
-
+    const newUser = new User({ name, rollNumber, email, password: hashedPassword, hostel, roomNumber });
     await newUser.save();
-
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(201).json({
+      success: true,
+      msg: 'Registration successful',
+      token,
+      redirectTo: '/dashboard',
+      user: { id: newUser._id, name: newUser.name, email: newUser.email, hostel: newUser.hostel, rollNumber: newUser.rollNumber, roomNumber: newUser.roomNumber }
     });
-
-    res.status(201).json({ token, user: { id: newUser._id, name: newUser.name, email: newUser.email, hostel: newUser.hostel, rollNumber: newUser.rollNumber } });
   } catch (err) {
     console.error('Register Error:', err);
     res.status(500).json({ msg: 'Server error' });
   }
 };
+
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -55,7 +49,7 @@ export const loginUser = async (req, res) => {
 
     res.json({
       token,
-      user: { id: user._id, name: user.name, email, hostel: user.hostel }
+      user: { id: user._id, name: user.name, email, hostel: user.hostel,roomNumber: user.roomNumber }
     });
   } catch (err) {
     console.error('Login Error:', err);
@@ -71,6 +65,7 @@ export const getProfile = async (req, res) => {
       email: user.email,
       hostel: user.hostel,
       rollNumber: user.rollNumber,
+      roomNumber: user.roomNumber,
     })
   } else {
     res.status(404).json({ error: 'User not found' })

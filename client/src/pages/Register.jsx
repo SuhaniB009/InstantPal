@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
-import {api} from '../utils/api';
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [hostel, setHostel] = useState("");
+  const [roomNumber, setRoomNumber] = useState(""); 
   const [email, setEmail] = useState("");
-  const [rollNumber, setRollNumber] = useState(""); // New state
+  const [rollNumber, setRollNumber] = useState(""); 
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,16 +21,33 @@ const Register = () => {
 
     const name = `${firstName} ${lastName}`;
 
+    // ✅ Client-side validation for room number
+    if (!/^\d{4}$/.test(roomNumber)) {
+      alert("Room number must be exactly 4 digits.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await axios.post('/api/auth/register', {
+      const res = await axios.post("/api/auth/register", {
         name,
         email,
         password,
         hostel,
-        rollNumber, // Include roll number
+        roomNumber,
+        rollNumber,
       });
 
-      alert("Registration successful!");
+      if (res.data?.token) {
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+
+        // ✅ redirect using navigate
+        navigate("/dashboard");
+      } else {
+        alert("Registration successful, please login.");
+        navigate("/login");
+      }
     } catch (err) {
       alert(err.response?.data?.msg || "Registration failed.");
     } finally {
@@ -70,14 +90,25 @@ const Register = () => {
             required
           />
 
-          <input
-            type="text"
-            placeholder="Hostel / Block*"
-            value={hostel}
-            onChange={(e) => setHostel(e.target.value)}
-            className="w-full px-4 py-2 border-b-2 focus:outline-none focus:border-blue-500 placeholder:text-sm"
-            required
-          />
+          <div className="flex gap-4">
+            <input
+              type="text"
+              placeholder="Hostel / Block*"
+              value={hostel}
+              onChange={(e) => setHostel(e.target.value)}
+              className="w-1/2 px-4 py-2 border-b-2 focus:outline-none focus:border-blue-500 placeholder:text-sm"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Room No. (4 digits)*"
+              value={roomNumber}
+              onChange={(e) => setRoomNumber(e.target.value)}
+              maxLength={4}
+              className="w-1/2 px-4 py-2 border-b-2 focus:outline-none focus:border-blue-500 placeholder:text-sm"
+              required
+            />
+          </div>
 
           <input
             type="email"
@@ -105,13 +136,7 @@ const Register = () => {
             {loading ? "Signing up..." : "Create Account"}
           </button>
 
-          <button
-            type="button"
-            className="flex items-center justify-center w-full border border-gray-300 rounded-md py-2 text-sm font-medium gap-2 hover:bg-gray-50 mb-6"
-          >
-            <FcGoogle className="text-xl" />
-            Sign up with Google
-          </button>
+
 
           <div className="text-center mt-2 text-sm">
             <a href="/login" className="text-blue-600 hover:underline">

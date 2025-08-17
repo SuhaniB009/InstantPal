@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
+
 const Header = () => {
-  const [user, setUser] = useState({ name: '', hostel: '' })
+  const [user, setUser] = useState({ name: '', hostel: '',roomNumber: '' })
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -41,7 +42,7 @@ const Header = () => {
         />
         <div className="flex flex-col">
           <h2 className="text-lg font-semibold text-gray-800">Welcome, {user.name}</h2>
-          <span className="text-xs text-gray-500">Hostel {user.hostel}</span>
+          <span className="text-xs text-gray-500">Hostel {user.hostel} | Room {user.roomNumber}</span>
         </div>
       </div>
 

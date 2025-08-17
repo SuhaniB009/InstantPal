@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import { io } from 'socket.io-client';
+import { api } from '../utils/api';
 
-const JoinOrderModal = ({ order, isOpen, onClose, onSubmit }) => {
+const socket = io(api.defaults.baseURL);
+
+const JoinOrderModal = ({ order, isOpen, onClose, onSubmit, currentUser }) => {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [link, setLink] = useState('');
@@ -15,7 +19,22 @@ const JoinOrderModal = ({ order, isOpen, onClose, onSubmit }) => {
       return;
     }
     setError('');
+
+    // Add item to order
     onSubmit({ name, quantity, link });
+
+    // Emit message to chat (so all members see it in ChatBox)
+    socket.emit('sendMessage', {
+      orderId: order._id,
+      sender: currentUser?.name || "Someone",
+      message: `${currentUser?.name || "Someone"} added ${quantity} × ${name} ${link ? `(Link: ${link})` : ""} to the order.`,
+    });
+
+    // Reset and close
+    setName('');
+    setQuantity(1);
+    setLink('');
+    onClose();
   };
 
   return (

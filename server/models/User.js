@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema({
   hostel: {
     type: String,
     required: true
+  },
+  roomNumber: {
+    type: String,
+    required: true,
+   
   }
 }, { timestamps: true });
 
