@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema({
   roomNumber: {
     type: String,
     required: true,
-   
-  }
+    match: [/^\d{4}$/, 'Room number must be exactly 4 digits']
+    }  
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);
