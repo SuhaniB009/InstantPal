@@ -42,7 +42,7 @@ const Header = () => {
         />
         <div className="flex flex-col">
           <h2 className="text-lg font-semibold text-gray-800">Welcome, {user.name}</h2>
-          <span className="text-xs text-gray-500">Hostel {user.hostel} | Room {user.roomNumber}</span>
+          <span className="text-xs text-gray-500">Hostel {user.hostel}</span>
         </div>
       </div>
 

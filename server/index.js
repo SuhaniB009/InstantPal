@@ -18,27 +18,31 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+// ✅ Update allowed origins (include both local + deployed frontend)
 const allowedOrigins = [
   'http://localhost:5173',
   'https://instantpal-client.onrender.com'
-].filter(Boolean);
+];
 
+// ✅ Better CORS handling
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('CORS not allowed'), false);
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin);
+      callback(new Error('CORS not allowed'));
+    }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   credentials: true,
-  optionsSuccessStatus: 200
 };
 
-const io = new Server(server, { cors: corsOptions });
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Middlewares
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 
@@ -46,10 +50,23 @@ app.get('/', (_req, res) => {
   res.send('Instapal backend is running 🚀');
 });
 
+// MongoDB
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log('✅ MongoDB connected'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
+
+// ✅ Socket.IO setup
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
 
 io.on('connection', (socket) => {
   console.log(`📡 User connected: ${socket.id}`);
@@ -75,22 +92,23 @@ io.on('connection', (socket) => {
         user: userId,
         name: user.name,
         text: text.trim(),
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
-      const order = await Order.findByIdAndUpdate(
+      await Order.findByIdAndUpdate(
         orderId,
         { $push: { chat: message } },
         { new: true }
       );
 
-      if (order) {
-        const updatedOrder = await Order.findById(orderId)
-          .populate('chat.user', 'name');
+      const updatedOrder = await Order.findById(orderId).populate(
+        'chat.user',
+        'name'
+      );
 
-        const lastMessage = updatedOrder.chat[updatedOrder.chat.length - 1];
-        io.to(orderId).emit('receive_message', lastMessage);
-      }
+      const lastMessage =
+        updatedOrder.chat[updatedOrder.chat.length - 1];
+      io.to(orderId).emit('receive_message', lastMessage);
     } catch (error) {
       console.error('Error handling message:', error);
     }
@@ -101,5 +119,6 @@ io.on('connection', (socket) => {
   });
 });
 
+// Server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

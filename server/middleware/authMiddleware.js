@@ -1,6 +1,11 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
+/**
+ * Single auth guard used across the app.
+ * Attaches full user doc (without password) to req.user
+ * and also mirrors _id -> id for compatibility.
+ */
 export const protect = async (req, res, next) => {
   const auth = req.headers.authorization;
 
@@ -8,18 +13,19 @@ export const protect = async (req, res, next) => {
     try {
       const token = auth.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
-      req.user = await User.findById(decoded.id).select('-password');
 
-      // ✅ Add this check to ensure the user still exists
-      if (req.user) {
-        next(); // If user is found, proceed
-      } else {
-        // If user is null (e.g., deleted), send an error
-        res.status(401).json({ error: 'Unauthorized - User not found' });
+      const user = await User.findById(decoded.id).select('-password');
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized - User not found' });
       }
 
+      // Attach and normalize ids for legacy code
+      req.user = user;
+      if (!req.user.id) req.user.id = user._id;
+
+      next();
     } catch (err) {
+      console.error('Auth error:', err);
       res.status(401).json({ error: 'Unauthorized - Invalid token' });
     }
   } else {

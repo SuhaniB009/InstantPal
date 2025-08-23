@@ -1,42 +1,55 @@
 import Order from '../models/Order.js';
 import User from '../models/User.js';
-// server/controllers/orderController.js
-// ✅ Add message to an order's chat
+
+/**
+ * Add a chat message to an order (REST fallback in addition to socket.io)
+ */
 export const addMessageToOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { text } = req.body;
 
-    if (!text) {
-      return res.status(400).json({ message: "Message text is required" });
+    if (!text || !text.trim()) {
+      return res.status(400).json({ message: 'Message text is required' });
     }
 
     const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    // req.user is set by protect; normalize id reference
+    const userId = req.user._id || req.user.id;
+    const userDoc = await User.findById(userId);
+    if (!userDoc) return res.status(404).json({ message: 'User not found' });
 
     const newMessage = {
-      user: req.user._id,
-      name: req.user.name,
-      text,
+      user: userDoc._id,
+      name: userDoc.name,
+      text: text.trim(),
     };
 
     order.chat.push(newMessage);
     await order.save();
 
-    res.status(201).json(newMessage);
+    // return the last message populated like your socket send
+    const populated = await Order.findById(orderId).populate('chat.user', 'name');
+    const last = populated.chat[populated.chat.length - 1];
+
+    res.status(201).json(last);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to send message" });
+    console.error('addMessageToOrder error:', error);
+    res.status(500).json({ message: 'Failed to send message' });
   }
 };
-export const createOrder = async (req, res) => {
-  const { platform, upiId, optionalMessage } = req.body;
-  const userId = req.user.id;
 
+export const createOrder = async (req, res) => {
   try {
+    const userId = req.user._id || req.user.id;
     const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+
+    const { platform, upiId, optionalMessage } = req.body;
+
     const newOrder = new Order({
       initiatedBy: user._id,
       hostel: user.hostel,
@@ -57,11 +70,11 @@ export const createOrder = async (req, res) => {
 
 export const getOrdersByHostel = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const userId = req.user._id || req.user.id;
+    const user = await User.findById(userId);
     if (!user) return res.status(404).json({ msg: 'User not found' });
 
-    const hostel = user.hostel;
-    const orders = await Order.find({ hostel, status: 'Open' })
+    const orders = await Order.find({ hostel: user.hostel, status: 'Open' })
       .populate('initiatedBy', 'name email')
       .populate('items.user', 'name email')
       .sort({ createdAt: -1 });
@@ -74,11 +87,11 @@ export const getOrdersByHostel = async (req, res) => {
 };
 
 export const joinOrder = async (req, res) => {
-  const { orderId } = req.params;
-  const { name, quantity, link } = req.body;
-  const userId = req.user.id;
-
   try {
+    const { orderId } = req.params;
+    const { name, quantity, link } = req.body;
+    const userId = req.user._id || req.user.id;
+
     const order = await Order.findById(orderId);
     if (!order) return res.status(404).json({ msg: 'Order not found' });
     if (order.status === 'Locked') return res.status(403).json({ msg: 'Order is locked' });
@@ -98,14 +111,14 @@ export const joinOrder = async (req, res) => {
 };
 
 export const lockOrder = async (req, res) => {
-  const { orderId } = req.params;
-  const userId = req.user.id;
-
   try {
+    const { orderId } = req.params;
+    const userId = req.user._id || req.user.id;
+
     const order = await Order.findById(orderId);
     if (!order) return res.status(404).json({ msg: 'Order not found' });
 
-    if (order.initiatedBy.toString() !== userId) {
+    if (order.initiatedBy.toString() !== String(userId)) {
       return res.status(403).json({ msg: 'Only the initiator can lock the order' });
     }
 
@@ -120,18 +133,19 @@ export const lockOrder = async (req, res) => {
 };
 
 export const getUserOrders = async (req, res) => {
-  const userId = req.user.id;
   try {
+    const userId = req.user._id || req.user.id;
+
     const orders = await Order.find({
       $or: [
         { initiatedBy: userId },
         { 'items.user': userId }
       ]
     })
-    .populate('initiatedBy', 'name email')
-    .populate('items.user', 'name email')
-    .populate('chat.user', 'name') // ✅ Added this line to load chat user names
-    .sort({ createdAt: -1 });
+      .populate('initiatedBy', 'name email')
+      .populate('items.user', 'name email')
+      .populate('chat.user', 'name') // ensure chat usernames resolved
+      .sort({ createdAt: -1 });
 
     res.json(orders);
   } catch (err) {
@@ -145,7 +159,7 @@ export const getOrderById = async (req, res) => {
     const order = await Order.findById(req.params.id)
       .populate('initiatedBy', 'name email')
       .populate('items.user', 'name email')
-      .populate('chat.user', 'name'); // ✅ Added this line to load chat user names
+      .populate('chat.user', 'name');
 
     if (!order) return res.status(404).json({ msg: 'Order not found' });
     res.json(order);
@@ -158,13 +172,13 @@ export const getOrderById = async (req, res) => {
 export const deleteOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
-    const userId = req.user.id;
-    const order = await Order.findById(orderId);
+    const userId = req.user._id || req.user.id;
 
+    const order = await Order.findById(orderId);
     if (!order) return res.status(404).json({ msg: 'Order not found' });
 
-    const isInitiator = order.initiatedBy.toString() === userId.toString();
-    const isParticipant = order.items.some(item => item.user.toString() === userId.toString());
+    const isInitiator = order.initiatedBy.toString() === String(userId);
+    const isParticipant = order.items.some(item => item.user.toString() === String(userId));
 
     if (!isInitiator && !isParticipant) {
       return res.status(403).json({ msg: 'Not authorized to delete this order' });
@@ -175,11 +189,10 @@ export const deleteOrder = async (req, res) => {
       return res.status(200).json({ msg: 'Order deleted for all users in same hostel' });
     }
 
-    if (isParticipant) {
-      order.items = order.items.filter(item => item.user.toString() !== userId.toString());
-      await order.save();
-      return res.status(200).json({ msg: 'You have left the order' });
-    }
+    // participant leaves order
+    order.items = order.items.filter(item => item.user.toString() !== String(userId));
+    await order.save();
+    return res.status(200).json({ msg: 'You have left the order' });
   } catch (error) {
     console.error('Delete Order Error:', error);
     res.status(500).json({ msg: 'Server error' });
