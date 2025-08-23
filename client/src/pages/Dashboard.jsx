@@ -27,9 +27,9 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       const [userRes, myOrdersRes, availableOrdersRes] = await Promise.all([
-        api.get('/api/auth/profile', config),
-        api.get('/api/orders/myorders', config),
-        api.get('/api/orders/hostel', config)
+        api.get('/auth/profile', config),
+        api.get('/orders/myorders', config),
+        api.get('/orders/hostel', config)
       ]);
 
       setUser(userRes.data);
@@ -61,7 +61,7 @@ const Dashboard = () => {
 
   const handleStartOrder = async () => {
     try {
-      await api.post('/api/orders/create', { platform, upiId, optionalMessage }, config);
+      await api.post('/orders/create', { platform, upiId, optionalMessage }, config);
       await fetchData();
       setUpiId('');
       setOptionalMessage('');
@@ -83,7 +83,7 @@ const Dashboard = () => {
   const handleJoinSubmit = async (formData) => {
     if (!selectedOrder?._id) return;
     try {
-      await api.post(`/api/orders/join/${selectedOrder._id}`, formData, config);
+      await api.post(`/orders/join/${selectedOrder._id}`, formData, config);
       await fetchData();
       handleCloseJoinModal();
     } catch (err) {
@@ -93,7 +93,7 @@ const Dashboard = () => {
 
   const handleLock = async (orderId) => {
     try {
-      await api.post(`/api/orders/lock/${orderId}`, {}, config);
+      await api.post(`/orders/lock/${orderId}`, {}, config);
       await fetchData();
     } catch (err) {
       alert(err?.response?.data?.message || 'Failed to lock order.');
@@ -103,7 +103,7 @@ const Dashboard = () => {
   const handleDelete = async (orderId) => {
     if (!window.confirm("Are you sure? This will permanently delete the order for everyone.")) return;
     try {
-      await api.delete(`/api/orders/${orderId}`, config);
+      await api.delete(`/orders/${orderId}`, config);
       await fetchData();
     } catch (err) {
       alert(err?.response?.data?.message || "Failed to delete order.");

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import {api} from '../utils/api';
 const Register = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -29,7 +29,7 @@ const Register = () => {
     }
 
     try {
-      const res = await axios.post("/api/auth/register", {
+      const res = await api.post("/auth/register", {
         name,
         email,
         password,

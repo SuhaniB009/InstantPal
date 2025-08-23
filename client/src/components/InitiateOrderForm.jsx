@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import {api} from "../utils/api";
 const InitiateOrderForm = () => {
   const [platform, setPlatform] = useState('Blinkit');
   const [products, setProducts] = useState('');
@@ -55,7 +55,7 @@ const InitiateOrderForm = () => {
       formData.append('message', message);
       if (qrImage) formData.append('qrImage', qrImage);
 
-      const response = await axios.post('/api/orders', formData, {
+      const response = await api.post('/orders', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,

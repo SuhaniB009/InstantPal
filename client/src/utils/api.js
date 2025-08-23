@@ -4,7 +4,7 @@ import axios from 'axios';
 const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 const api = axios.create({
-  baseURL: baseURL,
+  baseURL: baseURL+'/api',
 });
 
 // This interceptor automatically attaches the auth token to every request.

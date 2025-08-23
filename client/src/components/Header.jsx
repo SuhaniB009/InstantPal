@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import {api} from "../utils/api";
 
 
 const Header = () => {
@@ -11,7 +12,7 @@ const Header = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get('/api/auth/profile', {
+        const res = await api.get('/auth/profile', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },

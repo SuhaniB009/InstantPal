@@ -23,7 +23,7 @@ const ChatBox = ({ orderId, currentUser, onNewMessage }) => {
 
     const fetchChatHistory = async () => {
       try {
-        const res = await api.get(`/api/orders/${orderId}`, config);
+        const res = await api.get(`/orders/${orderId}`, config);
         setMessages(res.data.chat || []);
       } catch (error) {
         console.error('Failed to fetch chat history:', error);
@@ -62,7 +62,7 @@ const ChatBox = ({ orderId, currentUser, onNewMessage }) => {
     try {
       // Save to DB
       const res = await api.post(
-        `/api/orders/${orderId}/chat`,
+        `/orders/${orderId}/chat`,
         { text: trimmed },
         config
       );

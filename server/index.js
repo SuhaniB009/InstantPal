@@ -1,3 +1,4 @@
+// index.js
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -12,58 +13,71 @@ import orderRoutes from './routes/orders.js';
 import Order from './models/Order.js';
 import User from './models/User.js';
 
-const __dirname = path.resolve();
 dotenv.config();
+const __dirname = path.resolve();
 
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Update allowed origins (include both local + deployed frontend)
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://instantpal-client.onrender.com'
-];
+/* ---------------------- CORS: robust + prod friendly ---------------------- */
 
-// ✅ Better CORS handling
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('Blocked by CORS:', origin);
-      callback(new Error('CORS not allowed'));
-    }
-  },
-  credentials: true,
+// Accept env vars for deploy (e.g., Render) and fall back to local dev
+// Example .env on the server:
+//   CLIENT_URL=https://instantpal-client.onrender.com
+//   CLIENT_URL_2=http://localhost:5173
+const normalizeOrigin = (o) => {
+  try { return new URL(o).origin; } catch { return o; }
 };
 
-// Middlewares
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',   // Vite dev // CRA/dev alternative
+].filter(Boolean).map(normalizeOrigin);
+
+// Final CORS options used by Express
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser tools (Postman/cURL) which send no Origin
+    if (!origin) return callback(null, true);
+
+    const ori = normalizeOrigin(origin);
+    if (allowedOrigins.includes(ori)) return callback(null, true);
+
+    console.warn('[CORS] Blocked origin:', origin);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  maxAge: 86400, // cache preflight 24h
+};
+
+// MUST be before routes
 app.use(cors(corsOptions));
+// (optional) explicitly handle OPTIONS for legacy proxies
+app.options('*', cors(corsOptions));
+
+/* ---------------------------- App middlewares ----------------------------- */
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
+/* --------------------------------- Routes -------------------------------- */
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 
-app.get('/', (_req, res) => {
-  res.send('Instapal backend is running 🚀');
-});
+app.get('/', (_req, res) => res.send('Instapal backend is running 🚀'));
 
-// MongoDB
+/* ------------------------------ Mongo connect ---------------------------- */
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-// ✅ Socket.IO setup
+/* ---------------------------- Socket.IO CORS ----------------------------- */
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
-    methods: ['GET', 'POST'],
+    origin: allowedOrigins.length ? allowedOrigins : true,
+    methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
     credentials: true,
   },
 });
@@ -72,18 +86,21 @@ io.on('connection', (socket) => {
   console.log(`📡 User connected: ${socket.id}`);
 
   socket.on('join_order_room', (orderId) => {
+    if (!orderId) return;
     socket.join(orderId);
     console.log(`User ${socket.id} joined room ${orderId}`);
   });
 
   socket.on('leave_order_room', (orderId) => {
+    if (!orderId) return;
     socket.leave(orderId);
     console.log(`User ${socket.id} left room ${orderId}`);
   });
 
   socket.on('send_message', async ({ orderId, userId, text }) => {
     try {
-      if (!orderId || !userId || !text?.trim()) return;
+      const trimmed = (text || '').trim();
+      if (!orderId || !userId || !trimmed) return;
 
       const user = await User.findById(userId);
       if (!user) return;
@@ -91,7 +108,7 @@ io.on('connection', (socket) => {
       const message = {
         user: userId,
         name: user.name,
-        text: text.trim(),
+        text: trimmed,
         createdAt: new Date(),
       };
 
@@ -101,16 +118,13 @@ io.on('connection', (socket) => {
         { new: true }
       );
 
-      const updatedOrder = await Order.findById(orderId).populate(
-        'chat.user',
-        'name'
-      );
+      const updated = await Order.findById(orderId).populate('chat.user', 'name');
+      if (!updated || !updated.chat?.length) return;
 
-      const lastMessage =
-        updatedOrder.chat[updatedOrder.chat.length - 1];
+      const lastMessage = updated.chat[updated.chat.length - 1];
       io.to(orderId).emit('receive_message', lastMessage);
-    } catch (error) {
-      console.error('Error handling message:', error);
+    } catch (err) {
+      console.error('Error handling message:', err);
     }
   });
 
@@ -119,6 +133,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// Server
+/* --------------------------------- Server -------------------------------- */
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
