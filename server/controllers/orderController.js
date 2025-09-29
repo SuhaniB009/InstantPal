@@ -1,9 +1,6 @@
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 
-/**
- * Add a chat message to an order (REST fallback in addition to socket.io)
- */
 export const addMessageToOrder = async (req, res) => {
   try {
     const { orderId } = req.params;

@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// ✅ Chat message schema
 const messageSchema = new mongoose.Schema(
   {
     user: {
@@ -9,26 +8,24 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
     name: {
-      type: String, // store sender name for convenience
+      type: String, 
       required: true,
     },
     text: {
-      type: String, // actual chat message
+      type: String, 
       required: true,
     },
   },
   { timestamps: true }
 );
 
-// ✅ Item schema (for order items)
 const itemSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   name: { type: String, required: true },
   quantity: { type: Number, required: true },
-  link: { type: String }, // optional product link
+  link: { type: String }, 
 });
 
-// ✅ Main Order schema
 const orderSchema = new mongoose.Schema(
   {
     initiatedBy: {
@@ -62,7 +59,7 @@ const orderSchema = new mongoose.Schema(
     },
     lockedAt: { type: Date },
 
-    // ✅ Chat messages will persist until order is deleted
+ 
     chat: [messageSchema],
 
     joinedUsers: [

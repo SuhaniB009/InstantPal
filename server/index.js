@@ -19,10 +19,6 @@ const __dirname = path.resolve();
 const app = express();
 const server = http.createServer(app);
 
-/* ---------------------- CORS: robust + prod friendly ---------------------- */
-
-// Accept env vars for deploy (e.g., Render) and fall back to local dev
-// Example .env on the server:
 //   CLIENT_URL=https://instantpal-client.onrender.com
 //   CLIENT_URL_2=http://localhost:5173
 const normalizeOrigin = (o) => {
@@ -34,10 +30,10 @@ const allowedOrigins = [
   'http://localhost:5173',   // Vite dev // CRA/dev alternative
 ].filter(Boolean).map(normalizeOrigin);
 
-// Final CORS options used by Express
+
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow non-browser tools (Postman/cURL) which send no Origin
+  
     if (!origin) return callback(null, true);
 
     const ori = normalizeOrigin(origin);
@@ -49,31 +45,31 @@ const corsOptions = {
   credentials: true,
   methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  maxAge: 86400, // cache preflight 24h
+  maxAge: 86400, 
 };
 
-// MUST be before routes
+
 app.use(cors(corsOptions));
-// (optional) explicitly handle OPTIONS for legacy proxies
+
 app.options('*', cors(corsOptions));
 
-/* ---------------------------- App middlewares ----------------------------- */
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-/* --------------------------------- Routes -------------------------------- */
+
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 
 app.get('/', (_req, res) => res.send('Instapal backend is running 🚀'));
 
-/* ------------------------------ Mongo connect ---------------------------- */
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-/* ---------------------------- Socket.IO CORS ----------------------------- */
+
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins.length ? allowedOrigins : true,
@@ -133,6 +129,5 @@ io.on('connection', (socket) => {
   });
 });
 
-/* --------------------------------- Server -------------------------------- */
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
