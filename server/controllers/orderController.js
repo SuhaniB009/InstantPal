@@ -13,7 +13,7 @@ export const addMessageToOrder = async (req, res) => {
     const order = await Order.findById(orderId);
     if (!order) return res.status(404).json({ message: 'Order not found' });
 
-    // req.user is set by protect; normalize id reference
+   
     const userId = req.user._id || req.user.id;
     const userDoc = await User.findById(userId);
     if (!userDoc) return res.status(404).json({ message: 'User not found' });
@@ -186,7 +186,7 @@ export const deleteOrder = async (req, res) => {
       return res.status(200).json({ msg: 'Order deleted for all users in same hostel' });
     }
 
-    // participant leaves order
+
     order.items = order.items.filter(item => item.user.toString() !== String(userId));
     await order.save();
     return res.status(200).json({ msg: 'You have left the order' });

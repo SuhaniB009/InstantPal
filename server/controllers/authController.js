@@ -8,7 +8,7 @@ export const registerUser = async (req, res) => {
 
     const name = `${firstName} ${lastName}`.trim();
 
-    // College email validation (lowercase letters requirement kept)
+  
     if (!/^[0-9]{4}[a-z]{4}[0-9]{3}@nitjsr\.ac\.in$/.test(email)) {
       return res.status(400).json({ error: 'Invalid college email format.' });
     }
@@ -75,7 +75,7 @@ export const loginUser = async (req, res) => {
 };
 
 export const getProfile = async (req, res) => {
-  const user = req.user; // set by protect middleware
+  const user = req.user; 
   if (user) {
     res.json({
       name: user.name,
