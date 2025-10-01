@@ -4,11 +4,9 @@ import User from '../models/User.js';
 
 export const registerUser = async (req, res) => {
   try {
-    const { firstName, lastName, rollNumber, email, password, hostel, roomNumber } = req.body;
+    const { name, rollNumber, email, password, hostel, roomNumber } = req.body;
 
-    const name = `${firstName} ${lastName}`.trim();
 
-  
     if (!/^[0-9]{4}[a-z]{4}[0-9]{3}@nitjsr\.ac\.in$/.test(email)) {
       return res.status(400).json({ error: 'Invalid college email format.' });
     }
