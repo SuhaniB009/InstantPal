@@ -18,7 +18,7 @@ export default function WhyInstapal() {
       icon: <Bell className="text-green-600 w-6 h-6" />,
       title: 'Smart Notifications',
       description:
-        'Get notified when students in your location start group orders. Never miss a chance to save.',
+        'Get notified when students in your hostel start group orders. Never miss a chance to save.',
     },
   ]
 

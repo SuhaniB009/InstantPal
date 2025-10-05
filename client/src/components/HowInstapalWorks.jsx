@@ -4,7 +4,7 @@ export default function HowInstapalWorks() {
   const steps = [
     {
       title: 'Create or join group orders',
-      description: 'Start a new order or join an existing one with a simple link, making collaboration effortless.',
+      description: 'Start a new order or join an existing one with a simple join button, making collaboration effortless.',
     },
     {
       title: 'Add items with direct links',
@@ -12,16 +12,16 @@ export default function HowInstapalWorks() {
     },
     {
       title: 'Chat with group members',
-      description: 'Coordinate choices and confirm details with a built-in group chat for seamless communication.',
+      description: 'Confirm details with a built-in group chat for seamless communication.',
     },
     {
       title: 'Collect payments via UPI',
-      description: 'Split the bill and collect payments from everyone directly in the app using any UPI service.',
+      description: 'Collect payments from everyone directly in the app by putting your UPI ID.',
     },
-    {
+   /* {
       title: 'Track order status together',
       description: 'Everyone gets real-time updates on the order status, from preparation to delivery.',
-    },
+    },*/
   ]
 
   return (
@@ -31,7 +31,7 @@ export default function HowInstapalWorks() {
           How Instapal Works
         </h2>
         <p className="text-gray-600 mb-12">
-          Collaborate effortlessly with friends and hostelmates — from item selection to delivery tracking.
+          Collaborate effortlessly with friends and hostelmates from item selection to order updates to seamless payment .
         </p>
 
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">

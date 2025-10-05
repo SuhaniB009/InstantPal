@@ -55,7 +55,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex-1 hidden lg:flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center">
           <img
             src="/instapal_home_image copy.png"
             alt="Group order illustration"
@@ -102,7 +102,7 @@ export default function Home() {
 
 
       <footer className="bg-gray-100 text-center py-6 text-sm text-gray-500">
-        Built with ❤️ by NITJSR students | Instapal 2025
+        Built by NITJSR students | Instapal 2025
       </footer>
 
     </div>
