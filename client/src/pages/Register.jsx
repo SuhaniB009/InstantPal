@@ -56,8 +56,8 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#151544] flex items-center justify-center px-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-50 via-white to-blue-10 px-4 py-12">
+      <div className="w-full max-w-md bg-yellow-50 shadow-xl rounded-xl p-8">
         <h2 className="text-3xl font-semibold text-center text-gray-900">Sign up</h2>
         <br />
 
@@ -83,7 +83,7 @@ const Register = () => {
 
           <input
             type="text"
-            placeholder="Roll Number*"
+            placeholder="Registration Number*"
             value={rollNumber}
             onChange={(e) => setRollNumber(e.target.value)}
             className="w-full px-4 py-2 border-b-2 focus:outline-none focus:border-blue-500 placeholder:text-sm"
