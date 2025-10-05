@@ -9,7 +9,7 @@ export default function Home() {
     <div className=" min-h-screen flex flex-col">
 
       <Navbar/>
-      <div className="flex-1 flex flex-col lg:flex-row bg-white shadow-yellow">
+      <div className="flex-1 flex flex-col lg:flex-row pt-20 bg-white shadow-yellow">
         <div className="flex-1 flex items-center justify-center p-8 bg-white">
           <div className="max-w-md text-center lg:text-left">
             <div className="text-left mb-6 relative">
