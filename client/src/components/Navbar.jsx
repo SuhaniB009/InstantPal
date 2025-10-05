@@ -11,7 +11,7 @@ function Navbar() {
         <img 
           src="/instaPal Logo.png"  
           alt="Instapal Logo" 
-          className="h-10 w-10" 
+          className="h-12 w-12" 
         />
         <span className="text-3xl font-bold text-blue-800">Instapal</span>
       </Link>
