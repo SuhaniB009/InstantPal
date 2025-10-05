@@ -59,7 +59,7 @@ const MyOrders = ({
             <div>
               <p className="font-bold text-lg">{order.platform}</p>
               <p className="text-sm text-gray-500">
-                Initiated by: {isInitiator ? "You" : order.initiatedBy?.name}
+                Initiated by: {isInitiator ? "You" : `${order.initiatedBy?.name} (${order.initiatedBy?.roomNumber})`}
               </p>
               <p>
                 <strong>Status:</strong>{" "}
@@ -68,7 +68,7 @@ const MyOrders = ({
                     <FaTruck /> Order Placed
                   </span>
                 ) : (
-                  <span className="text-green-600 font-semibold">✅ Open</span>
+                  <span className="text-green-650 font-semibold"> Open</span>
                 )}
               </p>
 
@@ -139,8 +139,10 @@ const MyOrders = ({
                     <div className="absolute -left-[33px] top-1 h-4 w-4 bg-white border-2 border-blue-500 rounded-full"></div>
                     <div className="font-bold flex items-center gap-2 text-gray-700">
                       <FaUserCircle />
-                      {item.user?.name || "A User"}
+                      {item.user?.name || "A User" }
+                      <div className="font-medium">({item.user?.roomNumber})</div>
                     </div>
+
                     <div className="pl-6 text-sm text-gray-600 mt-1">
                       <p>
                         <span className="font-medium">Item:</span> {item.name} (

@@ -48,11 +48,7 @@ export default function Login() {
         </p>
        
 
-        <div className="flex items-center justify-center mb-4">
-          <hr className="flex-grow border-gray-300" />
-          <span className="px-2 text-gray-400 text-sm">OR</span>
-          <hr className="flex-grow border-gray-300" />
-        </div>
+
 
         {error && (
           <div className="bg-red-100 text-red-600 p-2 mb-4 rounded-md text-sm text-center">

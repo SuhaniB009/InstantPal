@@ -18,18 +18,15 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
-  // ✅ attach token for auth headers
-  const config = useMemo(
-    () => ({ headers: { Authorization: `Bearer ${token}` } }),
-    [token]
-  );
-
+  
   const fetchData = async () => {
+
     try {
+      
       const [userRes, myOrdersRes, availableOrdersRes] = await Promise.all([
-        api.get('/auth/profile', config),
-        api.get('/orders/myorders', config),
-        api.get('/orders/hostel', config)
+        api.get('/auth/profile'),
+        api.get('/orders/myorders'),
+        api.get('/orders/hostel')
       ]);
 
       setUser(userRes.data);

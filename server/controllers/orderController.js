@@ -67,13 +67,12 @@ export const createOrder = async (req, res) => {
 
 export const getOrdersByHostel = async (req, res) => {
   try {
-    const userId = req.user._id || req.user.id;
-    const user = await User.findById(userId);
+    const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ msg: 'User not found' });
 
     const orders = await Order.find({ hostel: user.hostel, status: 'Open' })
-      .populate('initiatedBy', 'name email')
-      .populate('items.user', 'name email')
+      .populate('initiatedBy', 'name email roomNumber')
+      .populate('items.user', 'name email roomNumber')
       .sort({ createdAt: -1 });
 
     res.json(orders);
@@ -83,11 +82,12 @@ export const getOrdersByHostel = async (req, res) => {
   }
 };
 
+
 export const joinOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { name, quantity, link } = req.body;
-    const userId = req.user._id || req.user.id;
+    const userId = req.user.id;
 
     const order = await Order.findById(orderId);
     if (!order) return res.status(404).json({ msg: 'Order not found' });
@@ -97,8 +97,8 @@ export const joinOrder = async (req, res) => {
     await order.save();
 
     const populatedOrder = await Order.findById(orderId)
-      .populate('items.user', 'name email')
-      .populate('initiatedBy', 'name email');
+      .populate('items.user', 'name email roomNumber')
+      .populate('initiatedBy', 'name email roomNumber');
 
     res.json(populatedOrder);
   } catch (err) {
@@ -106,7 +106,6 @@ export const joinOrder = async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 };
-
 export const lockOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -131,19 +130,12 @@ export const lockOrder = async (req, res) => {
 
 export const getUserOrders = async (req, res) => {
   try {
-    const userId = req.user._id || req.user.id;
-
-    const orders = await Order.find({
-      $or: [
-        { initiatedBy: userId },
-        { 'items.user': userId }
-      ]
-    })
-      .populate('initiatedBy', 'name email')
-      .populate('items.user', 'name email')
-      .populate('chat.user', 'name') // ensure chat usernames resolved
+    const userId = req.user.id;
+    const orders = await Order.find({ $or: [{ initiatedBy: userId }, { 'items.user': userId }] })
+      .populate('initiatedBy', 'name email roomNumber')
+      .populate('items.user', 'name email roomNumber')
+      .populate('chat.user', 'name')
       .sort({ createdAt: -1 });
-
     res.json(orders);
   } catch (err) {
     console.error('Get User Orders Error:', err);
@@ -154,10 +146,9 @@ export const getUserOrders = async (req, res) => {
 export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
-      .populate('initiatedBy', 'name email')
-      .populate('items.user', 'name email')
+      .populate('initiatedBy', 'name email roomNumber')
+      .populate('items.user', 'name email roomNumber')
       .populate('chat.user', 'name');
-
     if (!order) return res.status(404).json({ msg: 'Order not found' });
     res.json(order);
   } catch (err) {
