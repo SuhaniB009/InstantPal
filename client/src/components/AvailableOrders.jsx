@@ -20,19 +20,19 @@ const AvailableOrders = ({ orders, onJoinClick }) => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <img src="location-img copy.png" alt="Hostel" className="w-5 h-5" />
-                    <h3 className="font-bold text-lg">{order.hostel}</h3>
+                    <h3 className="font-bold text-lg">Hostel {order.hostel}</h3>
                   </div>
                   <div className="flex items-center gap-2">
                     <img src="platform-img copy.png" alt="Platform" className="w-5 h-5" />
-                    <p><span className="font-medium">{order.platform}</span></p>
+                    <p><span className=" font-normal">{order.platform}</span></p>
                   </div>
                   <div className="flex items-center gap-2">
                     <img src="initiator-img.png" alt="Initiator" className="w-4 h-4" />
-                    <p><span className="text-sm">{order.initiatedBy?.name}</span></p>
+                    <p><span className="font-normal">{ order.initiatedBy?.name}-{order.initiatedBy?.roomNumber}</span></p>
                   </div>
                   <div className="flex items-center gap-2">
                     <img src="clock-img copy.png" alt="Time" className="w-4 h-4" />
-                    <p>{formatDistanceToNow(new Date(order.createdAt))} ago</p>
+                    <p><span className="font-normal">{formatDistanceToNow(new Date(order.createdAt))} ago</span></p>
                   </div>
                   <div className="flex items-center gap-2">
                     <img src="open-img copy.png" alt="Status" className="w-4 h-4" />
@@ -52,7 +52,7 @@ const AvailableOrders = ({ orders, onJoinClick }) => {
                         onClick={() => onJoinClick(order)}
                         className="bg-yellow-300 text-black px-4 py-2 rounded hover:bg-yellow-400 font-semibold"
                       >
-                        🤝 Join
+                         Join
                       </button>
                     </div>
                   )}

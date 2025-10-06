@@ -64,11 +64,11 @@ const MyOrders = ({
               <p>
                 <strong>Status:</strong>{" "}
                 {locked ? (
-                  <span className="text-blue-600 font-semibold flex items-center gap-2">
+                  <span className="text-blue-700 font-semibold flex items-center gap-2">
                     <FaTruck /> Order Placed
                   </span>
                 ) : (
-                  <span className="text-green-650 font-semibold"> Open</span>
+                  <span className="text-green-600 font-semibold"> Open</span>
                 )}
               </p>
 

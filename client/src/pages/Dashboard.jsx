@@ -18,15 +18,18 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
-  
+  const config = useMemo(
+    () => ({ headers: { Authorization: `Bearer ${token}` } }),
+    [token]
+  );
   const fetchData = async () => {
 
     try {
       
       const [userRes, myOrdersRes, availableOrdersRes] = await Promise.all([
-        api.get('/auth/profile'),
-        api.get('/orders/myorders'),
-        api.get('/orders/hostel')
+        api.get('/auth/profile', config),
+        api.get('/orders/myorders', config),
+        api.get('/orders/hostel', config)
       ]);
 
       setUser(userRes.data);
@@ -116,7 +119,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6 space-y-8">
+    <div className=" p-6 space-y-8">
       <Header user={user} />
 
       {/* ✅ Available Orders */}
