@@ -18,7 +18,6 @@ function Navbar() {
       
 
       <div className="hidden md:flex items-center space-x-4">
-        <Link to="/" className="text-gray-700 hover:text-blue-600">Home</Link>
         <Link to="/login" className="text-gray-700 hover:text-blue-600">Login</Link>
         <Link to="/register" className="btn btn-primary px-4 py-1 text-sm">Get Started</Link>
       </div>
@@ -32,13 +31,7 @@ function Navbar() {
 
       {isOpen && (
         <div className="absolute top-16 left-0 w-full bg-white border-t border-gray-200 shadow-md flex flex-col items-center space-y-3 py-4 md:hidden z-50">
-          <Link
-            to="/"
-            className="text-gray-700 hover:text-blue-600"
-            onClick={() => setIsOpen(false)}
-          >
-            Home
-          </Link>
+
           <Link
             to="/login"
             className="text-gray-700 hover:text-blue-600"
