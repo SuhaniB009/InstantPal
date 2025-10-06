@@ -88,7 +88,7 @@ const ChatBox = ({ orderId, currentUser, onNewMessage }) => {
 
   return (
     <div className="mt-4 border-t pt-4">
-      <h4 className="font-semibold text-gray-800 mb-2">Order Chat</h4>
+      <h4 className="font-semibold text-gray-800 mb-2">Group Chat</h4>
 
       <div className="h-64 overflow-y-auto bg-gray-50 p-3 rounded-lg border flex flex-col gap-3">
         {messages.map((msg, index) => {
